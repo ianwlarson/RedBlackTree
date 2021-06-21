@@ -3,6 +3,13 @@
 
 #include "rbspeed_helper.h"
 
+// Define a key type that can be used to locate entries in the tree
+typedef struct my_key_type myk_t;
+struct my_key_type {
+    int my_key;
+};
+
+
 // Define a static inline pure function that compares two nodes
 __attribute__((pure))
 static inline int
