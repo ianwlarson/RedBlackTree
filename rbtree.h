@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <assert.h>
 
 // Embeddable node
 typedef struct red_black_tree_node rbn_t;
@@ -333,7 +334,7 @@ rb_delete_fixup(rbt_t *const tree, rbn_t *x)
 }
 
 static inline void
-rb_delete(rbt_t *const tree, rbn_t *const z)
+rb_base_delete(rbt_t *const tree, rbn_t *const z)
 {
     if (z == tree->m_min) {
         tree->m_min = (z->rc != &tree->m_nil) ? z->rc : z->p;
@@ -388,7 +389,7 @@ rbt_base_rem(rbt_t *const tree, void const*const key, rbtkeycmp_t cmpfunc)
         return NULL;
     }
 
-    rb_delete(tree, x);
+    rb_base_delete(tree, x);
 
     return x;
 }
@@ -402,7 +403,7 @@ rbt_base_popmin(rbt_t *const tree)
         return NULL;
     }
 
-    rb_delete(tree, x);
+    rb_base_delete(tree, x);
 
     return x;
 }
@@ -416,7 +417,7 @@ rbt_base_popmax(rbt_t *const tree)
         return NULL;
     }
 
-    rb_delete(tree, x);
+    rb_base_delete(tree, x);
 
     return x;
 }
@@ -442,7 +443,126 @@ rbt_base_max(rbt_t const*const tree)
     return tree->m_max;
 }
 
+static inline rbn_t *
+rbt_base_lt(rbt_t const*const tree, void const*const key, rbtkeycmp_t const cmpfunc)
+{
+    rbn_t *x = tree->m_top;
+    rbn_t *y = x;
+    if (x == &tree->m_nil)
+        return NULL;
 
-//void *rbt_lt(rbt_t const*const tree, int *const key);
-//void *rbt_gt(rbt_t const*const tree, int *const key);
+    int cmp = cmpfunc(key, tree->m_min);
+    // If all elements in the tree are greater than or equal to the key, return
+    // NULL
+    if (cmp <= 0) {
+        return NULL;
+    }
+
+    while (x != &tree->m_nil) {
+        y = x;
+        cmp = cmpfunc(key, x);
+        if (cmp < 0) {
+            x = x->lc;
+        } else if (cmp > 0) {
+            x = x->rc;
+        } else {
+            return NULL;
+        }
+    }
+
+    assert(x == &tree->m_nil);
+    for (;;) {
+        cmp = cmpfunc(key, y);
+        if (cmp > 0) {
+            // y is less than key, done!
+            break;
+        }
+        y = y->p;
+    }
+
+    return y;
+}
+
+static inline rbn_t *
+rbt_base_gt(rbt_t const*const tree, void const*const key, rbtkeycmp_t const cmpfunc)
+{
+    rbn_t *x = tree->m_top;
+    rbn_t *y = x;
+    if (x == &tree->m_nil) {
+        return NULL;
+    }
+
+    int cmp = cmpfunc(key, tree->m_max);
+    // If all elements in the tree are less than or equal to the key, return
+    // NULL
+    if (cmp >= 0) {
+        return NULL;
+    }
+
+    while (x != &tree->m_nil) {
+        y = x;
+        cmp = cmpfunc(key, x);
+        if (cmp < 0) {
+            x = x->lc;
+        } else if (cmp > 0) {
+            x = x->rc;
+        } else {
+            return NULL;
+        }
+    }
+
+    assert(x == &tree->m_nil);
+    for (;;) {
+        cmp = cmpfunc(key, y);
+        if (cmp < 0) {
+            // y is greater than key, done!
+            break;
+        }
+        y = y->p;
+    }
+    return y;
+}
+
+#if 0
+void *
+rbt_next(rbt_t const*const tree, void *const elem, int *const key)
+{
+    rbn_t *const x = elem2nd(tree, elem);
+    rbn_t *y = NULL;
+
+    if (x->rc != &tree->m_nil) {
+        y = tree_minimum(tree, x->rc);
+    } else {
+        y = x->p;
+    }
+
+    if (y == &tree->m_nil) {
+        return NULL;
+    }
+
+    *key = y->key;
+    return nd2elem(tree, y);
+}
+
+void *
+rbt_prev(rbt_t const*const tree, void *const elem, int *const key)
+{
+    rbn_t *const x = elem2nd(tree, elem);
+    rbn_t *y = NULL;
+
+    if (x->rc != &tree->m_nil) {
+        y = tree_minimum(tree, x->rc);
+    } else {
+        y = x->p;
+    }
+
+    if (y == &tree->m_nil) {
+        return NULL;
+    }
+
+    *key = y->key;
+    return nd2elem(tree, y);
+}
+
+#endif
 
