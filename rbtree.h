@@ -62,7 +62,7 @@ static inline void
 right_rotate(rbt_t *const T, rbn_t *const x)
 {
     /*
-     * Right Rotate around &R->rc
+     * Right Rotate with the pivot point as the branch leading to x
      *
      *        R                R
      *       / \              / \
@@ -94,11 +94,11 @@ static inline void
 left_rotate(rbt_t *const T, rbn_t *const x)
 {
     /*
-     * Left Rotate
+     * Left Rotate with the pivot point as the branch leading to x
      *
      *        R              R
      *       / \            / \
-     *      x   z          y   x
+     *      x   z          y   z
      *     / \       ->   / \
      *    a   y          x   c
      *       / \        / \
