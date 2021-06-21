@@ -220,6 +220,45 @@ test_find_nearest(void **state)
     }
 }
 
+static void
+test_next_and_prev(void **state)
+{
+    (void)state;
+
+    rbt_t tree;
+    rbt_init(&tree);
+
+    // Fill the tree with keys like [0,3..27]
+    for (int i = 0; i < 10; ++i) {
+        test_obj_t *const obj = test_malloc(sizeof(*obj));
+        *obj = (test_obj_t) {
+            .key = 3 * i,
+        };
+        void *tmp = rbt_add(&tree, obj);
+        assert_ptr_equal(tmp, obj);
+    }
+
+    test_obj_t *obj = rbt_min(&tree);
+    assert_int_equal(obj->key, 0);
+
+    for (int i = 1; i < 10; ++i) {
+        obj = rbt_next(&tree, obj);
+        assert_int_equal(obj->key, 3 * i);
+    }
+
+    obj = rbt_max(&tree);
+    assert_int_equal(obj->key, 27);
+
+    for (int i = 8; i >= 0; --i) {
+        obj = rbt_prev(&tree, obj);
+        assert_int_equal(obj->key, 3 * i);
+    }
+
+    while (rbt_size(&tree) > 0) {
+        test_free(rbt_popmax(&tree));
+    }
+}
+
 int main(void) {
 
     const struct CMUnitTest tests[] = {
@@ -227,6 +266,7 @@ int main(void) {
         cmocka_unit_test(test_random_double_tree),
         cmocka_unit_test(test_add_twice),
         cmocka_unit_test(test_find_nearest),
+        cmocka_unit_test(test_next_and_prev),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }

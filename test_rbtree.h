@@ -138,3 +138,21 @@ rbt_max(rbt_t *const tree)
 
     return (void *)((unsigned char *)v - offsetof(test_obj_t, nd));
 }
+
+static inline test_obj_t *
+rbt_prev(rbt_t *const tree, test_obj_t *const obj)
+{
+    rbn_t *v = rbt_base_prev(tree, &obj->nd, mycmp);
+    if (v == NULL) return NULL;
+
+    return (void *)((unsigned char *)v - offsetof(test_obj_t, nd));
+}
+
+static inline test_obj_t *
+rbt_next(rbt_t *const tree, test_obj_t *const obj)
+{
+    rbn_t *v = rbt_base_next(tree, &obj->nd, mycmp);
+    if (v == NULL) return NULL;
+
+    return (void *)((unsigned char *)v - offsetof(test_obj_t, nd));
+}
