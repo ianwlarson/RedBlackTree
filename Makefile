@@ -9,7 +9,7 @@ rbspeed: rbspeed.c rbtree.h
 	$(CC) -o $@ $< -Ofast -Wall -Wpedantic
 
 test_rbtree: test_rbtree.c rbtree.h test_rbtree.h
-	$(CC) -o $@ $< -Ofast -Wall -Wpedantic -lcmocka
+	$(CC) -o $@ $< -Ofast -Wall -Wpedantic -lcmocka -fsanitize=undefined -fsanitize=address -ggdb3
 
 clean:
-	rm -rf *.o rbspeed
+	rm -rf *.o rbspeed test_rbtree

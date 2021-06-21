@@ -5,6 +5,9 @@
 #include <stdint.h>
 #include <assert.h>
 
+#define RED 1
+#define BLACK 0
+
 // Embeddable node
 typedef struct red_black_tree_node rbn_t;
 
@@ -40,6 +43,12 @@ static inline void
 rbt_init(rbt_t *const p_tree)
 {
     *p_tree = (rbt_t) {
+        .m_nil = {
+            .p = &p_tree->m_nil,
+            .lc = &p_tree->m_nil,
+            .rc = &p_tree->m_nil,
+            .color = BLACK,
+        },
         .m_top = &p_tree->m_nil,
         .m_size = 0,
         .m_min = &p_tree->m_nil,
@@ -54,9 +63,6 @@ rbt_size(rbt_t const*const p_tree)
 {
     return p_tree->m_size;
 }
-
-#define RED 1
-#define BLACK 0
 
 static inline void
 right_rotate(rbt_t *const T, rbn_t *const x)
@@ -192,26 +198,28 @@ rbt_base_add(rbt_t *const tree, rbn_t *const z, rbtcmp_t const cmpfunc)
             return x;
     }
 
-    int const mincmp = cmpfunc(z, tree->m_min);
     /* Once we decide to insert, fixup the max/min */
-    if ((tree->m_min == &tree->m_nil) || (mincmp < 0)) {
+    if ((tree->m_min == &tree->m_nil) ||
+        (cmpfunc(z, tree->m_min) < 0)) {
         tree->m_min = z;
     }
 
-    int const maxcmp = cmpfunc(z, tree->m_max);
-    if ((tree->m_max == &tree->m_nil) || (maxcmp > 0)) {
+    if ((tree->m_max == &tree->m_nil) ||
+        (cmpfunc(z, tree->m_max) > 0)) {
         tree->m_max = z;
     }
 
 
     z->p = y;
-    int const cmp = cmpfunc(z, y);
-    if (y == &tree->m_nil)
+    if (y == &tree->m_nil) {
         tree->m_top = z;
-    else if (cmp < 0)
-        y->lc = z;
-    else
-        y->rc = z;
+    } else {
+        int const cmp = cmpfunc(z, y);
+        if (cmp < 0)
+            y->lc = z;
+        else
+            y->rc = z;
+    }
 
     rb_insert_fixup(tree, z);
 
