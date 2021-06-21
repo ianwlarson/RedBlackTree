@@ -5,7 +5,7 @@ CC=gcc
 #all: bench test_rbtree
 all: rbspeed
 
-rbspeed: rbspeed.o
+rbspeed: rbspeed.c | rbtree.h
 	$(CC) -o $@ $^ -Ofast -Wall -Wpedantic
 
 clean:

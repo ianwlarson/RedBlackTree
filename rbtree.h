@@ -241,7 +241,7 @@ rb_find_node_by_key(rbt_t const*const tree, void const*const key, rbtkeycmp_t co
 
 // Gets the pointer associated with a key.
 __attribute__((pure))
-rbn_t *
+static inline rbn_t *
 rbt_base_get(rbt_t const*const tree, void const*const key, rbtkeycmp_t const cmpfunc)
 {
     rbn_t *const x = rb_find_node_by_key(tree, key, cmpfunc);
