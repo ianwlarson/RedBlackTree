@@ -44,8 +44,6 @@ main(void)
     uint64_t add_ns = 0;
     uint64_t rem_ns = 0;
 
-    uint64_t overhead_ns = 0;
-
     for (int i = 0; i < NUM_OBJS; ++i) {
         // Put all the objects into the tree
         my_t *a = rbt_add(&tree, &objs[i]);
@@ -54,15 +52,6 @@ main(void)
             a = rbt_add(&tree, &objs[i]);
         }
     }
-
-    for (int i = 0; i < NUM_LOOPS; ++i) {
-        clock_gettime(CLOCK_REALTIME, &start);
-        clock_gettime(CLOCK_REALTIME, &end);
-        overhead_ns += (end.tv_sec - start.tv_sec)*UINT64_C(1000000000) + (end.tv_nsec - start.tv_nsec);
-    }
-
-    double const overhead = 1.0 * overhead_ns / NUM_LOOPS;
-    printf("Overhead is %f nanoseconds\n", overhead);
 
     my_t **ptrs = malloc(sizeof(*ptrs) * NUM_INNER_LOOP);
 
@@ -101,9 +90,9 @@ main(void)
 
     double const divisor = 1.0 * NUM_LOOPS * NUM_INNER_LOOP;
     printf("Ran test with a tree of size %d\n", NUM_OBJS);
-    printf("Average time to get a node: %f nanoseconds\n", 1.0 * get_ns / divisor - overhead);
-    printf("Average time to add a node: %f nanoseconds\n", 1.0 * add_ns / divisor - overhead);
-    printf("Average time to remove a node: %f nanoseconds\n", 1.0 * rem_ns / divisor - overhead);
+    printf("Average time to get a node: %f nanoseconds\n", 1.0 * get_ns / divisor);
+    printf("Average time to add a node: %f nanoseconds\n", 1.0 * add_ns / divisor);
+    printf("Average time to remove a node: %f nanoseconds\n", 1.0 * rem_ns / divisor);
 
     free(objs);
 
