@@ -61,6 +61,7 @@ rbt_get(rbt_t *const tree, int key)
 
     return (void *)((unsigned char *)v - offsetof(my_t, ok));
 }
+
 my_t *
 rbt_rem(rbt_t *const tree, int key)
 {
@@ -73,4 +74,11 @@ rbt_rem(rbt_t *const tree, int key)
     return (void *)((unsigned char *)v - offsetof(my_t, ok));
 }
 
+my_t *
+rbt_popmax(rbt_t *const tree)
+{
+    rbn_t *v = rbt_base_popmax(tree);
+    if (v == NULL) return NULL;
 
+    return (void *)((unsigned char *)v - offsetof(my_t, ok));
+}

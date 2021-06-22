@@ -12,3 +12,4 @@ struct my_type {
 my_t *rbt_add(rbt_t *const tree, my_t *const obj);
 my_t *rbt_get(rbt_t *const tree, int key);
 my_t *rbt_rem(rbt_t *const tree, int key);
+my_t *rbt_popmax(rbt_t *const tree);
